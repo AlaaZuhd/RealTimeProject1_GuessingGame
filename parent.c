@@ -88,11 +88,12 @@ void sig_int_catcher(int sig_num){
 }
 
 void start_game(){
-  printf("\033[0;36m"); //set the color to cyan
+  char e = 27; 
+  printf("\033[1;36m"); //set the color to cyan, and make the text bold
   printf("\t\tWe Are Starting This INTERESTING Game!\n");
   printf("\033[0m");// reset the color to the default
   printf("\t\t--------------------------------------\n\n");
-  printf("\033[0;36m"); //set the color to cyan
+  printf("\033[1;36m"); //set the color to cyan, and make the text bold
   printf("The results of round no.%d are as follows:\n",number_of_rounds);
   int i, pid;
   //file descripters of the pipes
@@ -151,8 +152,10 @@ void calculate_score(){
       big_score2 += atoi(token2);       //Adding the result to score2
       printf("The Current Total Score of P1 si: %d\tThe Current Total Score of P2 is: %d\n", big_score1, big_score2);
       printf("\033[0m");// reset the color to the default
-      printf("----------------------------------------------\n");
-      printf("----------------------------------------------\n");
+      printf("\033[4m");// text with underline
+      printf("_________________________________________________\n");
+      printf("\033[0m");// reset the color to the default
+      //printf("----------------------------------------------\n");
   }
   else {
       printf("\033[0;31m"); // set the color to red 
@@ -176,7 +179,7 @@ void guess_new_round(){
 //starting a new round is done by sending the SIGUSR1 to the players.
 void start_new_round(){
   number_of_rounds+=1;
-  printf("\033[0;36m"); //set the color to cyan
+  printf("\033[1;36m"); //set the color to cyan, and make the text bold
   printf("The results of round no.%d are as follows:\n",number_of_rounds);
   for( int i = 0; i < NUMBER_0F_PLAYERS; i ++){
     kill(children_pids[i],SIGUSR1);
@@ -185,8 +188,11 @@ void start_new_round(){
 
 //end gamr function states the needed number of round and declares the winner adn finally call terminate
 void end_game(){
-  printf("\033[0;33m"); // set the color to yellow
+  printf("\033[1m");
+  printf("\033[5;33m"); // set the color to yellow
   printf("GAME OVER :)\n\n");
+  printf("\033[0m");
+  printf("\033[1;33m"); // set the color to yellow
   printf("The Number of Needed Rounds is: %d\n\n",number_of_rounds);
   if(big_score1 > big_score2){
     printf("The Winner is: P1 :-)\n");
