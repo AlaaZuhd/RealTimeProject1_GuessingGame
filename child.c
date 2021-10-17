@@ -64,7 +64,9 @@ void new_round(){
     for( i = 0 ; i < 10; i++ ){
         fprintf(fptr,"%d\n",*(random_numbers+i));
     }
-    fclose(fptr);
+    if(fclose(fptr)){
+        exit(-1);
+    }
     free(random_numbers);
 }
 //Informing the parent that the 10 random numbers are generated successfully.

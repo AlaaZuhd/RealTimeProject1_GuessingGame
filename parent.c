@@ -17,7 +17,7 @@ int number_of_ready_players = 0;  //counter for the number of ready players, res
 int number_of_rounds = 1;         //the number of needed rounds, it is set to one as a round is initiated by creating the children at first
 int big_score1 = 0;               //storing the score of the first player after each round
 int big_score2 = 0;               //storing the score of the second player after each round
-int children_pids[3];             //the pids of all forked processes
+int *children_pids;               //the pids of all forked processes
 char file_name[2][20];            //name of the file that should be created by P1 and P2
 int  f_des[2][2];                 //two pipes for communicating between the parent and the referee
 
@@ -88,16 +88,16 @@ void sig_int_catcher(int sig_num){
 }
 
 void start_game(){
-  char e = 27; 
   printf("\033[1;36m"); //set the color to cyan, and make the text bold
   printf("\t\tWe Are Starting This INTERESTING Game!\n");
-  printf("\033[0m");// reset the color to the default
+  printf("\033[0m");    // reset the color to the default
   printf("\t\t--------------------------------------\n\n");
-  printf("\033[1;36m"); //set the color to cyan, and make the text bold
+  printf("\033[1;36m"); //set the color to cyan
   printf("The results of round no.%d are as follows:\n",number_of_rounds);
   int i, pid;
   //file descripters of the pipes
   char read_pipe_number1[20], write_pipe_number1[20], read_pipe_number2[20], write_pipe_number2[20]; 
+  children_pids = malloc(3 * sizeof(int));
   //Forking
   for ( i = 0; i < NUMBER_OF_CHILDREN; i++ ) {
     //creating the players' files names
@@ -111,7 +111,7 @@ void start_game(){
       exit (-1);
     }
     if ( pid != 0 ) {             //parent 
-      children_pids[i] = pid; 
+      *(children_pids+i) = pid; 
     }
     else {                         //forked child
       if (i == NUMBER_0F_PLAYERS){ //referee
@@ -145,17 +145,15 @@ void calculate_score(){
   char message[20]; 
   if ( read(f_des[1][0], message, sizeof(message)) != -1 ) {
       char *token = strtok(message,"-");
-      printf("P1's Score in Current Round is: %d", atoi(token));
+      //printf("P1's Score in Current Round is: %d", atoi(token));
       big_score1 += atoi(token);        //Adding the result to score1 
       char *token2 = strtok(NULL,"\n");
-      printf("\tP2's Score in the Current Round is: %d\n", atoi(token2));
+      //printf("\tP2's Score in the Current Round is: %d\n", atoi(token2));
       big_score2 += atoi(token2);       //Adding the result to score2
-      printf("The Current Total Score of P1 si: %d\tThe Current Total Score of P2 is: %d\n", big_score1, big_score2);
+      printf("BigScore1: %d \tBigScore2: %d\n", big_score1, big_score2);
       printf("\033[0m");// reset the color to the default
-      printf("\033[4m");// text with underline
-      printf("_________________________________________________\n");
-      printf("\033[0m");// reset the color to the default
-      //printf("----------------------------------------------\n");
+      printf("----------------------------------------------\n");
+      printf("----------------------------------------------\n");
   }
   else {
       printf("\033[0;31m"); // set the color to red 
@@ -179,20 +177,20 @@ void guess_new_round(){
 //starting a new round is done by sending the SIGUSR1 to the players.
 void start_new_round(){
   number_of_rounds+=1;
-  printf("\033[1;36m"); //set the color to cyan, and make the text bold
+  printf("\033[1;36m"); //set the color to cyan
   printf("The results of round no.%d are as follows:\n",number_of_rounds);
   for( int i = 0; i < NUMBER_0F_PLAYERS; i ++){
-    kill(children_pids[i],SIGUSR1);
+    kill(*(children_pids+i),SIGUSR1);
   }
 }
 
 //end gamr function states the needed number of round and declares the winner adn finally call terminate
 void end_game(){
   printf("\033[1m");
-  printf("\033[5;33m"); // set the color to yellow
+  printf("\033[5;33m");    // set the color to yellow
   printf("GAME OVER :)\n\n");
   printf("\033[0m");
-  printf("\033[1;33m"); // set the color to yellow
+  printf("\033[1;33m");    // set the color to yellow
   printf("The Number of Needed Rounds is: %d\n\n",number_of_rounds);
   if(big_score1 > big_score2){
     printf("The Winner is: P1 :-)\n");
@@ -208,10 +206,12 @@ void end_game(){
 void terminate(){
   //killing the forked processes
   for (int i = 0; i < NUMBER_OF_CHILDREN ; i++){
-    kill(children_pids[i], SIGTERM);
+    kill(*(children_pids+i), SIGTERM);
   }
   //closing the pipes 
   close(f_des[0][1]);
   close(f_des[1][0]);
+  //free the children_pids 
+  free(children_pids);
   exit(0);
 }

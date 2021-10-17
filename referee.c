@@ -87,8 +87,12 @@ void calculate_score(char* message){
     }
     printf("Score1: %d \t Score2: %d\n", score1, score2);
     
-    fclose(fptr1);
-    fclose(fptr2);
+    if(fclose(fptr1)){
+        exit(-1);
+    }
+    if(fclose(fptr2)){
+        exit(-1);
+    }
     //removing the files after reading.
     remove(file1_name);
     remove(file2_name);
