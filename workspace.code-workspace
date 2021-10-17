@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"name": "LearningBootstrap",
+			"path": "..\\..\\..\\..\\..\\Desktop\\Traininng\\LearningBootstrap"
+		},
+		{
+			"name": "ToDoList",
+			"path": "..\\..\\..\\..\\..\\Desktop\\Traininng\\FrontendTraining\\ToDoList"
+		}
+	],
+	"settings": {
+		"liveServer.settings.multiRootWorkspaceName": "LearningBootstrap"
+	}
+}
